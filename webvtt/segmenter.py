@@ -56,7 +56,7 @@ class WebVTTSegmenter(object):
                     f.write('\n{} --> {}\n'.format(caption.start, caption.end))
                     f.writelines(['{}\n'.format(l) for l in caption.lines])
 
-    def _write_manifest(self):
+    def _write_manifest(self, manifest_url):
         manifest_file = os.path.join(self._output_folder, 'prog_index.m3u8')
         with open(manifest_file, 'w', encoding='utf-8') as f:
             f.write('#EXTM3U\n')
@@ -66,11 +66,11 @@ class WebVTTSegmenter(object):
 
             for i in range(self.total_segments):
                 f.write('#EXTINF:30.00000\n')
-                f.write('fileSequence{}.webvtt\n'.format(i))
+                f.write(manifest_url+'fileSequence{}.webvtt\n'.format(i))
 
             f.write('#EXT-X-ENDLIST\n')
 
-    def segment(self, webvtt, output='', seconds=SECONDS, mpegts=MPEGTS):
+    def segment(self, webvtt, manifest_url='', output='', seconds=SECONDS, mpegts=MPEGTS):
         """Segments the captions based on a number of seconds."""
         if isinstance(webvtt, str):
             # if a string is supplied we parse the file
@@ -92,7 +92,7 @@ class WebVTTSegmenter(object):
 
         self._slice_segments(captions)
         self._write_segments()
-        self._write_manifest()
+        self._write_manifest(manifest_url)
 
     @property
     def seconds(self):
